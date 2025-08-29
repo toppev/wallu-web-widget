@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Wallu AI Web Widget - Extend Your Discord AI Bot to Any Website | Live Demo</title>
+  <meta name="description" content="Transform your Discord AI bot into a powerful website chat widget. Same knowledge, same AI, everywhere. Try our live demo with 5 customizable themes. One-line integration for WordPress, Shopify, React & more.">
+  <meta name="keywords" content="discord ai bot, website chat widget, ai customer support, discord bot extension, automated support, multilingual ai, web integration, customer service bot">
+  
+  <!-- Open Graph tags -->
+  <meta property="og:title" content="Wallu AI Web Widget - Extend Your Discord AI Bot to Any Website">
+  <meta property="og:description" content="Transform your Discord AI bot into a powerful website chat widget. Same knowledge, same AI, everywhere. Try our live demo with 5 customizable themes.">
+  <meta property="og:image" content="https://wallubot.com/favicon.ico">
+  <meta property="og:url" content="https://wallubot.com/widget">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Wallu AI">
+  
+  <!-- Twitter Card tags -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Wallu AI Web Widget - Extend Your Discord AI Bot to Any Website">
+  <meta name="twitter:description" content="Transform your Discord AI bot into a powerful website chat widget. Same knowledge, same AI, everywhere.">
+  <meta name="twitter:image" content="https://wallubot.com/favicon.ico">
+  
+  <!-- Additional SEO meta tags -->
+  <meta name="author" content="Wallu AI">
+  <meta name="robots" content="index, follow">
+  <meta name="googlebot" content="index, follow">
+  <meta name="language" content="en">
+  <link rel="canonical" href="https://wallubot.com/widget-demo">
+  <link rel="icon" type="image/x-icon" href="https://wallubot.com/favicon.ico">
+  <link rel="shortcut icon" href="https://wallubot.com/favicon.ico">
+  <link rel="apple-touch-icon" href="https://wallubot.com/favicon.ico">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <script>
+    // Add custom animations and styles via Tailwind config
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            surface: {
+              dark: '#0A0D14',
+              primary: '#1B1F27',
+              light: '#2A2F3C'
+            },
+            discord: '#5865F2',
+            corporate: '#3B82F6',
+            tech: '#8B5CF6',
+            gaming: '#EC4899'
+          },
+          fontFamily: {
+            'inter': ['Inter', 'sans-serif'],
+            'mono': ['Courier New', 'Monaco', 'monospace']
+          },
+          animation: {
+            'pulse-notification': 'pulse-notification 2s infinite',
+            'typing': 'typing 1.2s infinite ease-in-out',
+            'glow': 'glow 3s infinite'
+          },
+          keyframes: {
+            'pulse-notification': {
+              '0%, 100%': { transform: 'scale(1)' },
+              '50%': { transform: 'scale(1.1)' }
+            },
+            'typing': {
+              '0%, 60%, 100%': { transform: 'translateY(0)', opacity: '0.5' },
+              '30%': { transform: 'translateY(-4px)', opacity: '1' }
+            },
+            'glow': {
+              '0%, 100%': { boxShadow: '0 0 20px rgba(88, 101, 242, 0.3)' },
+              '50%': { boxShadow: '0 0 40px rgba(88, 101, 242, 0.6)' }
+            }
+          },
+          backgroundImage: {
+            'gradient-text': 'linear-gradient(135deg, #5865F2, #EB459E, #57F287)',
+            'gradient-teal': 'linear-gradient(135deg, #14B8A6, #5EEAD4)',
+            'gradient-teal-accent': 'linear-gradient(135deg, #14B8A6, #0D9488)',
+            'gradient-discord': 'linear-gradient(135deg, #5865F2 0%, #EB459E 100%)',
+            'gradient-corporate': 'linear-gradient(135deg, #3B82F6 0%, #1D4ED8 100%)',
+            'gradient-tech': 'linear-gradient(135deg, #8B5CF6 0%, #7C3AED 100%)',
+            'gradient-gaming': 'linear-gradient(135deg, #EC4899 0%, #8B5CF6 100%)',
+            'gradient-minimal': 'linear-gradient(135deg, #374151 0%, #1F2937 100%)',
+            'noise-bg': 'radial-gradient(circle at 25% 25%, rgba(88, 101, 242, 0.15) 0%, transparent 50%), radial-gradient(circle at 75% 75%, rgba(235, 69, 158, 0.15) 0%, transparent 50%), radial-gradient(circle at 50% 0%, rgba(87, 242, 135, 0.05) 0%, transparent 70%)',
+            'cyber-grid': 'linear-gradient(rgba(88, 101, 242, 0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(88, 101, 242, 0.03) 1px, transparent 1px)'
+          },
+          backgroundSize: {
+            'cyber-grid': '50px 50px'
+          },
+          boxShadow: {
+            'neon': '0 0 20px rgba(88, 101, 242, 0.3), inset 0 0 20px rgba(88, 101, 242, 0.05)',
+            'shadow-teal-glow': '0 0 20px rgba(20, 184, 166, 0.3)',
+            'teal-active': '0 0 0 1px #14B8A6',
+            'landing-card-hover': '0 0 20px rgba(20, 184, 166, 0.1)'
+          },
+          textShadow: {
+            'hack': '0 0 10px rgba(88, 101, 242, 0.5)'
+          },
+          zIndex: {
+            '99': '99'
+          }
+        }
+      }
+    };
+
+    // Add remaining complex styles that can't be handled by Tailwind utilities
+    const additionalStyles = document.createElement('style');
+    additionalStyles.textContent = `
+      .theme-preview::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: linear-gradient(45deg, transparent 30%, rgba(255,255,255,0.1) 50%, transparent 70%);
+        transform: translateX(-100%);
+        transition: transform 0.6s;
+      }
+      .theme-preview:hover::before {
+        transform: translateX(100%);
+      }
+      .theme-preview.active {
+        border-color: #14B8A6 !important;
+        box-shadow: 0 0 0 1px #14B8A6;
+      }
+    `;
+    document.head.appendChild(additionalStyles);
+  </script>
+  
+  <!-- Structured Data (JSON-LD) -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+    "name": "Wallu AI Web Widget",
+    "description": "Extend your Discord AI bot to any website with our customizable chat widget. Same knowledge, same AI, everywhere.",
+    "url": "https://wallubot.com/widget",
+    "applicationCategory": "CustomerService",
+    "operatingSystem": "Web Browser",
+    "offers": {
+      "@type": "Offer",
+      "price": "15.99",
+      "priceCurrency": "EUR",
+      "priceValidUntil": "2025-12-31"
+    },
+    "author": {
+      "@type": "Organization",
+      "name": "Wallu AI",
+      "url": "https://wallubot.com"
+    },
+    "featureList": [
+      "Discord AI bot extension to websites",
+      "Multilingual support (50+ languages)", 
+      "Customizable themes",
+      "One-line integration",
+      "24/7 automated support",
+      "WordPress, Shopify, React compatibility"
+    ],
+    "screenshot": "https://wallubot.com/favicon.ico",
+    "aggregateRating": {
+      "@type": "AggregateRating",
+      "ratingValue": "4.91",
+      "ratingCount": "171"
+    }
+  }
+  </script>
+</head>
+<body class="dark bg-surface-dark text-white font-inter">
+<!-- Hero Section -->
+<div class="min-h-screen relative overflow-hidden" style="background-color: #0A0D14; background-image: radial-gradient(circle at 25% 25%, rgba(20, 184, 166, 0.1) 0%, transparent 50%), radial-gradient(circle at 75% 75%, rgba(94, 234, 212, 0.08) 0%, transparent 50%), radial-gradient(circle at 50% 0%, rgba(20, 184, 166, 0.05) 0%, transparent 70%);">
+  <!-- Background decorations -->
+  <div class="absolute inset-0">
+    <div class="absolute top-1/4 left-1/4 w-64 h-64 bg-teal-500/10 rounded-full blur-3xl"></div>
+    <div class="absolute bottom-1/4 right-1/4 w-96 h-96 bg-teal-400/8 rounded-full blur-3xl"></div>
+    <div class="absolute top-1/2 right-1/3 w-32 h-32 bg-teal-600/12 rounded-full blur-2xl"></div>
+    <div class="absolute bottom-20 left-1/4 w-20 h-2 bg-gradient-to-r from-teal-400 to-transparent opacity-30"></div>
+  </div>
+
+  <div class="relative z-10 max-w-6xl mx-auto px-6 py-20">
+    <!-- Navigation -->
+    <nav class="flex justify-between items-center mb-16">
+      <a href="https://wallubot.com" class="flex items-center space-x-3 hover:opacity-80 transition-opacity">
+        <img src="https://wallubot.com/favicon.ico" alt="Wallu AI Logo" class="w-10 h-10" />
+        <span class="text-2xl font-bold text-white">Wallu</span>
+      </a>
+      <div class="flex items-center space-x-6">
+        <a href="https://wallubot.com" class="text-white-60 hover:text-white transition-colors">Get Started</a>
+        <a href="https://wallubot.com/widget-help" class="text-white-60 hover:text-white transition-colors">Documentation</a>
+        <a href="https://panel.wallubot.com/addons" class="bg-gradient-teal-accent hover:opacity-80 px-6 py-2 rounded-lg font-semibold text-white transition-all transform hover:scale-105">Get API Key</a>
+      </div>
+    </nav>
+
+    <!-- Hero Content -->
+    <div class="text-center mb-20">
+      <div class="inline-flex items-center space-x-2 bg-primary/50 backdrop-blur border border-teal-500/20 rounded-full px-6 py-2 mb-8">
+        <div class="w-2 h-2 bg-teal-500 rounded-full animate-pulse"></div>
+        <span class="text-sm text-white-60">Live Demo - Try it now!</span>
+      </div>
+
+      <h1 class="text-5xl md:text-7xl font-black mb-8 leading-tight">
+        <span class="text-white">Extend Your Discord AI</span><br>
+        <span class="bg-gradient-teal bg-clip-text text-transparent font-mono">&gt; To Your Website_</span>
+      </h1>
+
+      <p class="text-xl md:text-2xl text-white-75 mb-8 max-w-3xl mx-auto leading-relaxed">
+        Already using Wallu AI on Discord? Now extend that same AI assistant to your website visitors.
+        <span class="text-white font-semibold">Same knowledge, same AI, everywhere.</span>
+      </p>
+
+      <div class="shadow-teal-glow bg-primary/30 backdrop-blur rounded-xl p-6 mb-12 max-w-4xl mx-auto border border-teal-500/20">
+        <div class="flex items-center gap-3 mb-4">
+          <span class="font-mono text-teal-500">[INTEGRATION]</span>
+          <div class="flex-1 h-px bg-gradient-to-r from-teal-500 to-transparent"></div>
+        </div>
+        <div class="grid md:grid-cols-4 gap-4 text-center">
+          <div class="bg-surface-primary border border-gray-600 rounded-xl p-4 transition-all duration-300 hover:border-teal-500 hover:shadow-landing-card-hover">
+            <div class="text-lg font-bold text-teal-500">WordPress</div>
+            <div class="text-xs text-white-60">One-click plugin</div>
+          </div>
+          <div class="bg-surface-primary border border-gray-600 rounded-xl p-4 transition-all duration-300 hover:border-teal-500 hover:shadow-landing-card-hover">
+            <div class="text-lg font-bold text-teal-400">Shopify</div>
+            <div class="text-xs text-white-60">Theme integration</div>
+          </div>
+          <div class="bg-surface-primary border border-gray-600 rounded-xl p-4 transition-all duration-300 hover:border-teal-500 hover:shadow-landing-card-hover">
+            <div class="text-lg font-bold text-teal-500">React/Next.js</div>
+            <div class="text-xs text-white-60">Component ready</div>
+          </div>
+          <div class="bg-surface-primary border border-gray-600 rounded-xl p-4 transition-all duration-300 hover:border-teal-500 hover:shadow-landing-card-hover">
+            <div class="text-lg font-bold text-teal-400">Any Website</div>
+            <div class="text-xs text-white-60">One line of code</div>
+          </div>
+        </div>
+        <div class="text-center mt-4">
+          <span class="font-mono text-sm text-white-60">&gt; Works with your existing site - no rebuilding required</span>
+        </div>
+      </div>
+
+      <!-- CTA Buttons -->
+      <div class="flex flex-col sm:flex-row gap-4 justify-center items-center mb-16">
+        <button onclick="if(window.walluChatWidget) window.walluChatWidget.toggle(); else document.getElementById('walluChatButton')?.click();"
+                class="bg-gradient-teal-accent hover:opacity-80 text-white px-8 py-4 rounded-xl font-bold text-lg transition-all transform hover:scale-105 font-mono shadow-shadow-teal-glow">
+          &gt; Try Widget Below ↓
+        </button>
+        <a href="https://github.com/toppev/wallu-web-widget"
+           class="border-2 border-white-40 hover:border-white text-white-60 hover:text-white px-8 py-4 rounded-xl font-semibold transition-colors">
+          <svg class="inline w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 24 24">
+            <path
+              d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
+          </svg>
+          View on GitHub
+        </a>
+      </div>
+    </div>
+
+    <!-- Features Grid -->
+    <div class="grid md:grid-cols-3 gap-8 mb-20">
+      <div class="bg-surface-primary border border-gray-600 rounded-xl p-8 transition-all duration-300 hover:border-teal-500 hover:shadow-landing-card-hover">
+        <div class="w-14 h-14 bg-teal-500/20 rounded-xl flex items-center justify-center mb-6">
+          <svg class="w-7 h-7 text-teal-500" fill="currentColor" viewBox="0 0 24 24">
+            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+          </svg>
+        </div>
+        <h3 class="text-2xl font-bold mb-4 text-white">Your Discord AI, Extended</h3>
+        <p class="text-white-75">The same AI assistant your Discord community knows and loves, now available to website visitors. No separate training
+          needed.</p>
+      </div>
+
+      <div class="bg-surface-primary border border-gray-600 rounded-xl p-8 transition-all duration-300 hover:border-teal-500 hover:shadow-landing-card-hover">
+        <div class="w-14 h-14 bg-teal-500/20 rounded-xl flex items-center justify-center mb-6">
+          <svg class="w-7 h-7 text-teal-500" fill="currentColor" viewBox="0 0 24 24">
+            <path
+              d="M13 3c-4.97 0-9 4.03-9 9H1l3.89 3.89.07.14L9 12H6c0-3.87 3.13-7 7-7s7 3.13 7 7-3.13 7-7 7c-1.93 0-3.68-.79-4.94-2.06l-1.42 1.42C8.27 19.99 10.51 21 13 21c4.97 0 9-4.03 9-9s-4.03-9-9-9zm-1 5v5l4.28 2.54.72-1.21-3.5-2.08V8H12z"/>
+          </svg>
+        </div>
+        <h3 class="text-2xl font-bold mb-4 text-white">Instant Setup</h3>
+        <p class="text-white-75">Copy-paste integration. No complex configuration, no server setup, no headaches.</p>
+      </div>
+
+      <div class="bg-surface-primary border border-gray-600 rounded-xl p-8 transition-all duration-300 hover:border-teal-500 hover:shadow-landing-card-hover">
+        <div class="w-14 h-14 bg-teal-500/20 rounded-xl flex items-center justify-center mb-6">
+          <svg class="w-7 h-7 text-teal-500" fill="currentColor" viewBox="0 0 24 24">
+            <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+          </svg>
+        </div>
+        <h3 class="text-2xl font-bold mb-4 text-white">Discord-First Design</h3>
+        <p class="text-white-75">Built by Discord users, for Discord communities. Familiar interface that matches your server's vibe.</p>
+      </div>
+    </div>
+
+    <!-- Quick Start -->
+    <div class="shadow-teal-glow bg-gradient-to-r from-primary/40 to-primary/20 backdrop-blur rounded-3xl p-12 text-center border border-teal-500/20">
+      <div class="flex items-center justify-center gap-3 mb-6">
+        <span class="font-mono text-teal-500">[DEPLOY]</span>
+        <h2 class="text-4xl font-bold text-white">Ready in &lt; 60s</h2>
+      </div>
+      <p class="text-xl text-white-75 mb-8 font-mono">&gt; No registration walls. No complex setup. Just grab your key and deploy.</p>
+
+      <div class="flex flex-col sm:flex-row gap-6 justify-center items-center text-left max-w-2xl mx-auto">
+        <div class="flex items-center space-x-4 bg-surface-primary border border-gray-600 rounded-xl p-6 flex-1 transition-all duration-300 hover:border-teal-500 hover:shadow-landing-card-hover">
+          <div class="w-10 h-10 bg-gradient-teal-accent text-white rounded-full flex items-center justify-center font-bold font-mono">01</div>
+          <div>
+            <div class="font-semibold font-mono text-teal-500">&gt; Get API Key</div>
+            <div class="text-sm text-white-60">panel.wallubot.com/addons</div>
+          </div>
+        </div>
+
+        <div class="flex items-center space-x-4 bg-surface-primary border border-gray-600 rounded-xl p-6 flex-1 transition-all duration-300 hover:border-teal-500 hover:shadow-landing-card-hover">
+          <div class="w-10 h-10 bg-gradient-teal-accent text-white rounded-full flex items-center justify-center font-bold font-mono">02</div>
+          <div>
+            <div class="font-semibold font-mono text-teal-500">&gt; Deploy Widget</div>
+            <div class="text-sm text-white-60">One line of code</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="mt-8 p-4 bg-primary/80 rounded-lg border border-teal-500/20">
+        <div class="font-mono text-teal-500 text-sm mb-2">&gt; Installation:</div>
+        <div class="text-xs text-white-60 mb-2">1. Download wallu-widget.js</div>
+        <div class="text-xs text-white-60 mb-2">2. Configure API key inside</div>
+        <div class="text-xs text-white-60 mb-3">3. Add to your site:</div>
+        <code class="text-teal-500 text-sm bg-black/30 px-3 py-1 rounded">&lt;script src="./wallu-widget.js"&gt;&lt;/script&gt;</code>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Theme Controls -->
+<div class="fixed bottom-6 left-6" style="z-index: 99;">
+  <div class="bg-surface-primary border border-gray-600 rounded-xl p-6 shadow-2xl max-w-sm backdrop-blur transition-all duration-300 hover:border-teal-500 hover:shadow-landing-card-hover">
+    <div class="flex items-center gap-3 mb-4">
+      <div class="w-8 h-8 bg-teal-500/20 rounded-lg flex items-center justify-center">
+        <svg class="w-4 h-4 text-teal-500" fill="currentColor" viewBox="0 0 24 24">
+          <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+        </svg>
+      </div>
+      <h3 class="font-bold text-white">Theme Showcase</h3>
+    </div>
+    
+    <p class="text-white-75 text-sm mb-4">
+      Try our 5 premade themes! Each designed for different website styles. 
+      <span class="text-teal-500 font-semibold">Ask the AI to customize any theme</span> to match your brand.
+    </p>
+    
+    <!-- Theme Selector -->
+    <div class="mb-4">
+      <div class="flex items-center justify-between text-xs mb-2">
+        <span class="text-white-60">Current Theme:</span>
+        <span id="currentThemeName" class="text-teal-500 font-semibold">Discord</span>
+      </div>
+      
+      <div class="grid grid-cols-5 gap-2">
+        <button onclick="selectTheme('discord')" 
+                class="theme-preview bg-gradient-discord bg-cover bg-center relative overflow-hidden w-full h-8 rounded-lg border-2 border-transparent hover:border-teal-500 transition-all"
+                title="Discord - Dark theme with purple accents">
+        </button>
+        <button onclick="selectTheme('corporate')" 
+                class="theme-preview bg-gradient-corporate bg-cover bg-center relative overflow-hidden w-full h-8 rounded-lg border-2 border-transparent hover:border-teal-500 transition-all" 
+                title="Corporate - Clean blue professional theme">
+        </button>
+        <button onclick="selectTheme('tech')" 
+                class="theme-preview bg-gradient-tech bg-cover bg-center relative overflow-hidden w-full h-8 rounded-lg border-2 border-transparent hover:border-teal-500 transition-all" 
+                title="Tech - Modern purple tech theme">
+        </button>
+        <button onclick="selectTheme('gaming')" 
+                class="theme-preview bg-gradient-gaming bg-cover bg-center relative overflow-hidden w-full h-8 rounded-lg border-2 border-transparent hover:border-teal-500 transition-all" 
+                title="Gaming - Dark theme with pink accents">
+        </button>
+        <button onclick="selectTheme('minimal')" 
+                class="theme-preview bg-gradient-minimal bg-cover bg-center relative overflow-hidden w-full h-8 rounded-lg border-2 border-transparent hover:border-teal-500 transition-all" 
+                title="Minimal - Clean gray minimal theme">
+        </button>
+      </div>
+    </div>
+    
+    <button onclick="cycleTheme();"
+            class="w-full bg-gradient-teal-accent hover:opacity-80 text-white px-4 py-2 rounded-lg font-semibold text-sm transition-all transform hover:scale-105 mb-3">
+      🎨 Cycle Theme
+    </button>
+    
+    <div class="text-xs text-white-60 bg-primary/50 rounded-lg p-3">
+      <div class="flex items-start gap-2">
+        <span class="text-teal-500 mt-0.5">💡</span>
+        <div>
+          <div class="font-semibold text-teal-500 mb-1">Download
+            <a href="./wallu-widget.js" class="underline">wallu-widget.js</a> and ask another AI:</div>
+          <div>• "Make this theme match my website"</div>
+          <div>• "Make it open automatically after 30 seconds"</div>
+          <div>• "Make it more professional/casual"</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+<script>
+  // Configure the demo with our API key
+  // This overrides the placeholder in wallu-widget.js
+  window.WALLU_CONFIG = {
+    // This is public key (pk) - safe to expose in client-side code
+    apiKey: 'pk_90136f0a20f3bddbc340a99a878b96d2e28cb09e96c9e9d2e5d6dae629e6e46f',
+    botName: 'Wallu AI Demo',
+    welcomeMessage: 'Hey! 👋 I\'m your Discord AI assistant, now extended to your website. I have the same knowledge from your Discord server and can help visitors just like I help your community members!',
+    theme: 'discord'
+  };
+
+  // Theme management with localStorage
+  const themes = ['discord', 'corporate', 'tech', 'gaming', 'minimal'];
+  const themeNames = {
+    'discord': 'Discord',
+    'corporate': 'Corporate', 
+    'tech': 'Tech',
+    'gaming': 'Gaming',
+    'minimal': 'Minimal'
+  };
+
+  // Get current theme from localStorage or default to discord
+  function getCurrentTheme() {
+    return localStorage.getItem('wallu-demo-theme') || 'discord';
+  }
+
+  // Set theme in localStorage and reload page
+  function setTheme(theme) {
+    localStorage.setItem('wallu-demo-theme', theme);
+    window.location.reload();
+  }
+
+  // Cycle to next theme
+  function cycleTheme() {
+    const currentTheme = getCurrentTheme();
+    const currentIndex = themes.indexOf(currentTheme);
+    const nextIndex = (currentIndex + 1) % themes.length;
+    const nextTheme = themes[nextIndex];
+    
+    // Show loading state
+    const button = event.target;
+    const originalText = button.textContent;
+    button.textContent = `🎨 Loading ${themeNames[nextTheme]}...`;
+    button.disabled = true;
+    
+    // Set theme and reload
+    setTheme(nextTheme);
+  }
+
+  // Select specific theme
+  function selectTheme(theme) {
+    // Show loading state
+    const button = event.target;
+    button.style.opacity = '0.5';
+    button.disabled = true;
+    
+    // Set theme and reload
+    setTheme(theme);
+  }
+
+  // Initialize theme on page load
+  function initializeTheme() {
+    const currentTheme = getCurrentTheme();
+    
+    // Update theme name display
+    const themeNameElement = document.getElementById('currentThemeName');
+    if (themeNameElement) {
+      themeNameElement.textContent = themeNames[currentTheme];
+    }
+    
+    // Update active theme button
+    document.querySelectorAll('.theme-preview').forEach(btn => {
+      btn.classList.remove('active');
+    });
+    const activeButton = document.querySelector(`[onclick="selectTheme('${currentTheme}')"]`);
+    if (activeButton) {
+      activeButton.classList.add('active');
+    }
+    
+    // Update WALLU_CONFIG BEFORE script loads
+    window.WALLU_CONFIG.theme = currentTheme;
+  }
+
+  // Initialize theme immediately (before DOM ready)
+  initializeTheme();
+</script>
+
+<!-- Load Wallu Widget (same way users will) -->
+<script src="./wallu-widget.js"></script>
+
+</body>
+</html>

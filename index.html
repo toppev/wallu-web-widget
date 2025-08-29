@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Website - Now with Discord AI Support</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            margin: 0;
+            padding: 20px;
+            line-height: 1.6;
+            background: #1a1a1a;
+            color: #e0e0e0;
+        }
+        .container {
+            max-width: 800px;
+            margin: 40px auto;
+            text-align: center;
+        }
+        h1 {
+            font-size: 2em;
+            margin-bottom: 0.5em;
+            color: #fff;
+        }
+        p {
+            font-size: 1.1em;
+            margin-bottom: 1em;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🚀 This Website Now Has Wallu AI!</h1>
+        <p>This is a minimal example showing how to add Wallu AI chat widget to any website.</p>
+    </div>
+
+    <!-- This is the actual widget installation - keep these lines below! -->
+    <!-- Place wallu-widget.js in the same directory as this file (your public content or change the url here) -->
+    <script>
+      // We can either configure wallu here or in wallu-widget.js
+      window.WALLU_CONFIG = {
+        apiKey: 'pk_your_actual_key_here', // 🔑 REQUIRED: Get from https://panel.wallubot.com/addons
+        theme: 'discord',
+        botName: 'Support Assistant'
+      };
+    </script>
+    <script src="./wallu-widget.js"></script>
+</body>
+</html>
