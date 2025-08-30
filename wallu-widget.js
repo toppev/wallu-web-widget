@@ -201,6 +201,7 @@ const THEMES = {
         
         .wallu-mobile { position: fixed !important; inset: 0 !important; z-index: 1000000 !important; display: none !important; flex-direction: column !important; backdrop-filter: blur(8px) !important; background: rgba(0,0,0,0.3) !important; }
         .wallu-mobile.show { display: flex !important; animation: wallu-fadeIn 0.2s ease-out !important; }
+        .wallu-mobile .wallu-avatar { background: ${theme.primary} !important; color: white !important; }
         
         .wallu-pos-br { bottom: 20px !important; right: 20px !important; }
         .wallu-pos-bl { bottom: 20px !important; left: 20px !important; }
