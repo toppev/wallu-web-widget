@@ -121,7 +121,7 @@ const THEMES = {
           margin: 0 !important;
           padding: 0 !important;
           border: 0 !important;
-          z-index: 999999 !important;
+          z-index: 999990 !important;
           font: inherit !important;
           vertical-align: baseline !important;
         }
@@ -129,7 +129,7 @@ const THEMES = {
           font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif !important;
           line-height: 1.6 !important;
           color: inherit !important;
-          z-index: 999999 !important;
+          z-index: 999990 !important;
           font-feature-settings: "kern" 1, "liga" 1, "calt" 1 !important;
           -webkit-font-smoothing: antialiased !important;
           -moz-osx-font-smoothing: grayscale !important;
