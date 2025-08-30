@@ -543,7 +543,7 @@ class WalluChatWidget {
         headers: { 'Content-Type': 'application/json', 'X-API-Key': this.config.apiKey },
         body: JSON.stringify({
           addon: { name: 'web-widget (' + window.location.hostname + ')', version: '1.0.0' },
-          channel: { id: this.conversationId, name: 'Website Chat' },
+          channel: { id: window.location.pathname, name: 'Website Chat @ ' + window.location.pathname },
           user: { id: this.userId, username: 'Website Visitor', is_staff_member: false },
           message: { id: this.generateId(), is_bot_mentioned: true, content: message },
           configuration: { emoji_type: 'unicode', include_sources: false }
