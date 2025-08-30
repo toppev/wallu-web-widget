@@ -421,8 +421,14 @@ class WalluChatWidget {
       overlay.classList.add('show');
       document.getElementById('walluMobileMessages').innerHTML = document.getElementById('walluChatMessages').innerHTML;
       document.body.style.overflow = 'hidden';
+      
+      // Prevent auto-focus on mobile input
+      const input = document.getElementById('walluMobileMessageInput');
+      if (input) input.blur();
     } else {
       document.getElementById('walluChatWindow').classList.add('show');
+      // On desktop we focus
+      document.getElementById('walluMessageInput').focus();
     }
   }
 
