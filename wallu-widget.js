@@ -199,12 +199,7 @@ const THEMES = {
         .wallu-send:hover:not(:disabled) { transform: scale(1.08) !important; box-shadow: 0 8px 24px rgba(0,0,0,0.18) !important; }
         .wallu-send:disabled { opacity: 0.4 !important; cursor: not-allowed !important; background: ${theme.textSecondary} !important; transform: none !important; }
         
-        .wallu-welcome { text-align: center !important; padding: 40px 24px !important; }
-        .wallu-welcome-icon { width: 64px !important; height: 64px !important; border-radius: 50% !important; display: flex !important; align-items: center !important; justify-content: center !important; margin: 0 auto 20px !important; box-shadow: 0 8px 24px rgba(0,0,0,0.08) !important; animation: wallu-bounce 2s infinite !important; }
-        .wallu-welcome h4 { font-weight: 700 !important; margin-bottom: 12px !important; font-size: 20px !important; letter-spacing: -0.02em !important; }
-        .wallu-welcome p { font-size: 16px !important; line-height: 1.6 !important; opacity: 0.85 !important; font-weight: 400 !important; }
-        
-        .wallu-mobile { position: fixed !important; inset: 0 !important; z-index: 999998 !important; display: none !important; flex-direction: column !important; backdrop-filter: blur(8px) !important; background: rgba(0,0,0,0.3) !important; }
+        .wallu-mobile { position: fixed !important; inset: 0 !important; z-index: 1000000 !important; display: none !important; flex-direction: column !important; backdrop-filter: blur(8px) !important; background: rgba(0,0,0,0.3) !important; }
         .wallu-mobile.show { display: flex !important; animation: wallu-fadeIn 0.2s ease-out !important; }
         
         .wallu-pos-br { bottom: 20px !important; right: 20px !important; }
@@ -248,17 +243,8 @@ const THEMES = {
                     </button>
                 </div>
 
-                <div id="walluChatMessages" class="wallu-messages">
-                    <div class="wallu-welcome" style="color: ${theme.textSecondary};">
-                        <div class="wallu-welcome-icon" style="background: ${theme.primary}20;">
-                            <svg width="24" height="24" fill="${theme.primary}" viewBox="0 0 24 24">
-                                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
-                            </svg>
-                        </div>
-                        <h4 style="color: ${theme.text};">Welcome!</h4>
-                        <p>I'm your AI assistant. Ask me anything!</p>
-                    </div>
-                </div>
+                <!-- Messages appear here -->
+                <div id="walluChatMessages" class="wallu-messages"></div>
 
                 <div id="walluTypingIndicator" class="wallu-typing">
                     <div class="wallu-avatar" style="background: ${theme.primary}20; color: ${theme.primary};">AI</div>
@@ -437,25 +423,18 @@ class WalluChatWidget {
     } else {
       document.getElementById('walluChatWindow').classList.add('show');
     }
-
-    setTimeout(() => {
-      const input = this.isMobile ? document.getElementById('walluMobileMessageInput') : document.getElementById('walluMessageInput');
-      input.focus();
-    }, 100);
   }
 
   close() {
     this.isOpen = false;
     this.updateBadge();
 
-    if (this.isMobile) {
-      const overlay = document.getElementById('walluMobileOverlay');
-      overlay.classList.add('wallu-mobile-hidden');
-      overlay.classList.remove('show');
-      document.body.style.overflow = '';
-    } else {
-      document.getElementById('walluChatWindow').classList.remove('show');
-    }
+    // Close both mobile and desktop views to handle screen size changes
+    const overlay = document.getElementById('walluMobileOverlay');
+    overlay.classList.add('wallu-mobile-hidden');
+    overlay.classList.remove('show');
+    document.getElementById('walluChatWindow').classList.remove('show');
+    document.body.style.overflow = '';
   }
 
   updateBadge() {
@@ -491,10 +470,6 @@ class WalluChatWidget {
 
     bubble.innerHTML = text.replace(/(https?:\/\/[^\s]+)/g, '<a href="$1" target="_blank" rel="noopener noreferrer" class="wallu-link">$1</a>');
     msg.appendChild(bubble);
-
-    // Remove welcome message
-    const welcome = document.querySelector('#walluChatMessages .wallu-welcome');
-    if (welcome) welcome.remove();
 
     document.getElementById('walluChatMessages').appendChild(msg);
     if (this.isMobile && this.isOpen) document.getElementById('walluMobileMessages').appendChild(msg.cloneNode(true));
@@ -541,6 +516,7 @@ class WalluChatWidget {
 
     this.addMessage(message, 'user');
     input.value = '';
+    document.getElementById(this.isMobile ? 'walluMessageInput' : 'walluMobileMessageInput').value = '';
     document.getElementById('walluSendButton').disabled = true;
     document.getElementById('walluMobileSendButton').disabled = true;
 
