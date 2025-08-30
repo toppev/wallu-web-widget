@@ -52,6 +52,23 @@ That's it! Your Discord AI is now available on your website. 🎉
 
 ## ⚙️ Configuration Made Simple
 
+### 30-second installation
+
+```html
+<script>
+    // Configure your API key BEFORE loading the widget
+    window.WALLU_CONFIG = {
+        apiKey: 'pk_your_actual_key_here', // 🔑 REQUIRED: Get from https://panel.wallubot.com/addons
+        theme: 'gaming',
+    }
+</script>
+<script src="https://cdn.jsdelivr.net/gh/toppev/wallu-web-widget/wallu-widget.js"></script>
+```
+
+### Fully customizable (download & edit `wallu-widget.js`)
+
+TIP: Ask AI (Claude or ChatGPT) to customize the widget!
+
 Open `wallu-widget.js` and update the `WALLU_CONFIG` section:
 
 ```javascript
@@ -222,7 +239,7 @@ export default function ChatWidget() {
 
 ### HTML/Static Sites
 
-**Option 1: Configure API key via window.WALLU_CONFIG (No file editing)**
+**Option 1: Configure API key via window.WALLU_CONFIG (No downloading & editing wallu_widget.js)**
 
 ```html
 <!DOCTYPE html>
@@ -243,7 +260,7 @@ window.WALLU_CONFIG = {
     welcomeMessage: 'Hello! How can I help you today?'
 };
 </script>
-<script src="./wallu-widget.js"></script>
+<script src="https://cdn.jsdelivr.net/gh/toppev/wallu-web-widget/wallu-widget.js"></script>
 </body>
 </html>
 ```
