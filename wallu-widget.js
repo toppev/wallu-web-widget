@@ -229,7 +229,7 @@ const THEMES = {
   const widgetHTML = `
         <div id="walluWidget" class="wallu-widget">
             <button id="walluChatButton" class="wallu-btn ${positionClass}" style="background: linear-gradient(to right, ${theme.primary}, ${theme.secondary}); color: white;">
-                <div id="walluNotificationBadge" class="wallu-btn-badge">1</div>
+                <div id="walluNotificationBadge" class="wallu-btn-badge" style="visibility: hidden;">0</div>
                 <svg width="24" height="24" fill="currentColor" viewBox="0 0 24 24">
                     <path d="M20 2H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h4l4 4 4-4h4c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-2 12H6v-2h12v2zm0-3H6V9h12v2zm0-3H6V6h12v2z"/>
                 </svg>
@@ -345,6 +345,7 @@ class WalluChatWidget {
     this.isMobile = window.innerWidth < 768;
     this.conversationId = this.generateId();
     this.userId = this.generateId();
+    this.unreadCount = 0;
 
     setTimeout(() => this.init(), 100); // Wait for elements to be ready
   }
@@ -424,7 +425,8 @@ class WalluChatWidget {
 
   open() {
     this.isOpen = true;
-    document.getElementById('walluNotificationBadge').style.display = 'none';
+    this.unreadCount = 0;
+    this.updateBadge();
 
     if (this.isMobile) {
       const overlay = document.getElementById('walluMobileOverlay');
@@ -444,6 +446,7 @@ class WalluChatWidget {
 
   close() {
     this.isOpen = false;
+    this.updateBadge();
 
     if (this.isMobile) {
       const overlay = document.getElementById('walluMobileOverlay');
@@ -452,6 +455,18 @@ class WalluChatWidget {
       document.body.style.overflow = '';
     } else {
       document.getElementById('walluChatWindow').classList.remove('show');
+    }
+  }
+
+  updateBadge() {
+    const badge = document.getElementById('walluNotificationBadge');
+    if (!badge) return;
+    
+    if (this.unreadCount > 0 && !this.isOpen) {
+      badge.textContent = String(this.unreadCount);
+      badge.style.visibility = 'visible';
+    } else {
+      badge.style.visibility = 'hidden';
     }
   }
 
@@ -487,6 +502,12 @@ class WalluChatWidget {
     this.scroll();
     this.logToDiscord(text, sender, isError);
 
+    // Increment unread count for bot messages when chat is closed
+    if (sender === 'bot' && !this.isOpen) {
+      this.unreadCount++;
+      this.updateBadge();
+    }
+
     // For demo purposes, expose this method globally
     if (!window.walluChatWidget.addMessage) {
       window.walluChatWidget.addMessage = this.addMessage.bind(this);
@@ -518,22 +539,21 @@ class WalluChatWidget {
     const message = input.value.trim();
     if (!message) return;
 
+    this.addMessage(message, 'user');
+    input.value = '';
+    document.getElementById('walluSendButton').disabled = true;
+    document.getElementById('walluMobileSendButton').disabled = true;
+
     // Check if API key is still the default
     if (this.config.apiKey === 'pk_your_actual_key_here') {
       this.addMessage('❌ **API Key Error**: You need to replace the default API key with your real key from https://panel.wallubot.com/addons. The widget will not work until you set a valid API key.', 'bot', true);
       return;
     }
-
     // Check if API key starts with pk_ (public key)
     if (!this.config.apiKey.startsWith('pk_')) {
       this.addMessage('❌ **Invalid API Key**: The API key doesn\'t look like a public key (should start with "pk_"). You\'re probably using a private key (sk_) which cannot be used in the widget. Get your public key from https://panel.wallubot.com/addons', 'bot', true);
       return;
     }
-
-    this.addMessage(message, 'user');
-    input.value = '';
-    document.getElementById('walluSendButton').disabled = true;
-    document.getElementById('walluMobileSendButton').disabled = true;
 
     this.showTyping();
 
