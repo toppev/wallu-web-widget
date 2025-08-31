@@ -31,7 +31,7 @@ Perfect for Discord communities wanting to provide consistent AI assistance acro
 
 1. **Download** the `wallu-widget.js` file to your website's folder
 2. **Configure** your API key and theme inside the file (takes 30 seconds)
-3. **Add** one line to your website: `<script src="./wallu-widget.js"></script>`
+3. **Add** one line to your website: `<script defer src="./wallu-widget.js"></script>`
 
 That's it! Your Discord AI is now available on your website. 🎉
 
@@ -62,7 +62,7 @@ That's it! Your Discord AI is now available on your website. 🎉
         theme: 'gaming',
     }
 </script>
-<script src="https://cdn.jsdelivr.net/gh/toppev/wallu-web-widget/wallu-widget.js"></script>
+<script defer src="https://cdn.jsdelivr.net/gh/toppev/wallu-web-widget/wallu-widget.js"></script>
 ```
 
 ### Fully customizable (download & edit `wallu-widget.js`)
@@ -119,7 +119,7 @@ the [Wallu Panel - Channels](https://panel.wallubot.com/channels). This allows y
        botName: 'Support Assistant'
    };
    </script>
-   <script src="https://cdn.jsdelivr.net/gh/toppev/wallu-web-widget/wallu-widget.js"></script>
+   <script defer src="https://cdn.jsdelivr.net/gh/toppev/wallu-web-widget/wallu-widget.js"></script>
    ```
 
 **Option 2: Download and configure**
@@ -128,7 +128,7 @@ the [Wallu Panel - Channels](https://panel.wallubot.com/channels). This allows y
 2. Configure your API key in the `wallu-widget.js` file
 3. Add this to your theme's `functions.php` or use "Insert Headers and Footers":
    ```html
-   <script src="./wallu-widget.js"></script>
+   <script defer src="./wallu-widget.js"></script>
    ```
 
 ### Shopify
@@ -137,7 +137,7 @@ the [Wallu Panel - Channels](https://panel.wallubot.com/channels). This allows y
 2. Open `layout/theme.liquid`
 3. Add before `</body>`:
    ```html
-   <script src="{{ 'wallu-widget.js' | asset_url }}"></script>
+   <script defer src="{{ 'wallu-widget.js' | asset_url }}"></script>
    ```
 4. Configure your API key in the uploaded file and save
 
@@ -156,7 +156,7 @@ the [Wallu Panel - Channels](https://panel.wallubot.com/channels). This allows y
        botName: 'AI Assistant'
    };
    </script>
-   <script src="https://cdn.jsdelivr.net/gh/toppev/wallu-web-widget/wallu-widget.js"></script>
+   <script defer src="https://cdn.jsdelivr.net/gh/toppev/wallu-web-widget/wallu-widget.js"></script>
    ```
 3. Save changes
 
@@ -176,7 +176,7 @@ the [Wallu Panel - Channels](https://panel.wallubot.com/channels). This allows y
        botName: 'AI Assistant'
    };
    </script>
-   <script src="https://cdn.jsdelivr.net/gh/toppev/wallu-web-widget/wallu-widget.js"></script>
+   <script defer src="https://cdn.jsdelivr.net/gh/toppev/wallu-web-widget/wallu-widget.js"></script>
    ```
 4. Apply to all pages
 
@@ -200,7 +200,7 @@ export default function ChatWidget() {
         // Load the Wallu widget
         const script = document.createElement('script');
         script.src = 'https://cdn.jsdelivr.net/gh/toppev/wallu-web-widget/wallu-widget.js';
-        script.async = true;
+        script.defer = true;
         document.body.appendChild(script);
 
         return () => {
@@ -225,7 +225,7 @@ export default function ChatWidget() {
     useEffect(() => {
         const script = document.createElement('script');
         script.src = '/wallu-widget.js'; // Local file with your API key configured
-        script.async = true;
+        script.defer = true;
         document.body.appendChild(script);
 
         return () => {
@@ -260,7 +260,7 @@ window.WALLU_CONFIG = {
     welcomeMessage: 'Hello! How can I help you today?'
 };
 </script>
-<script src="https://cdn.jsdelivr.net/gh/toppev/wallu-web-widget/wallu-widget.js"></script>
+<script defer src="https://cdn.jsdelivr.net/gh/toppev/wallu-web-widget/wallu-widget.js"></script>
 </body>
 </html>
 ```
@@ -281,7 +281,7 @@ window.WALLU_CONFIG = {
 <!-- Your site content -->
 
 <!-- Wallu Chat Widget -->
-<script src="./wallu-widget.js"></script>
+<script defer src="./wallu-widget.js"></script>
 </body>
 </html>
 ```

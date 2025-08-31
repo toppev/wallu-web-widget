@@ -6,7 +6,7 @@
  *    Get your key from: https://panel.wallubot.com/addons
  * 2. Choose your theme (discord, corporate, tech, gaming, minimal)
  * 3. Save this file
- * 4. Add to your website: <script src="./wallu-widget.js"></script>
+ * 4. Add to your website: <script defer src="./wallu-widget.js"></script>
  *
  * ALTERNATIVE/ADVANCED: You can also set window.WALLU_CONFIG before loading this script
  * to override these settings without editing this file.
@@ -103,6 +103,267 @@ const THEMES = {
     error: '#EF4444'
   }
 };
+
+// ============ WIDGET CLASS ============
+class WalluChatWidget {
+  constructor(config, theme) {
+    this.config = config;
+    this.theme = theme;
+    this.apiUrl = 'https://api.wallubot.com/v1/on-message';
+    this.isOpen = false;
+    this.isMobile = window.innerWidth < 768;
+    this.conversationId = this.generateId();
+    this.userId = this.generateId();
+    this.unreadCount = 0;
+
+    setTimeout(() => this.init(), 100); // Wait for elements to be ready
+  }
+
+  generateId() {
+    return Date.now().toString(36) + Math.random().toString(36).substr(2);
+  }
+
+  init() {
+    this.bindEvents();
+
+    // Check if API key is still the default and show warning
+    if (this.config.apiKey === 'pk_your_actual_key_here') {
+      setTimeout(() => {
+        this.addMessage('⚠️ **Setup Required**: Please replace the default API key with your real key from https://panel.wallubot.com/addons to start using the widget.', 'bot', true);
+      }, 1500);
+    } else if (!this.config.apiKey.startsWith('pk_')) {
+      setTimeout(() => {
+        this.addMessage('❌ **Invalid API Key**: The API key doesn\'t look like a public key (should start with "pk_"). You may be using a private key (sk_) which cannot be used in the widget. Get your public key from https://panel.wallubot.com/addons', 'bot', true);
+      }, 1500);
+    }
+
+    setTimeout(() => this.addMessage(this.config.welcomeMessage, 'bot'), 1000);
+  }
+
+  bindEvents() {
+    const chatButton = document.getElementById('walluChatButton');
+    if (chatButton) chatButton.addEventListener('click', () => this.toggle());
+    const closeButton = document.getElementById('walluCloseButton');
+    const mobileCloseButton = document.getElementById('walluMobileCloseButton');
+    const sendButton = document.getElementById('walluSendButton');
+    const mobileSendButton = document.getElementById('walluMobileSendButton');
+
+    if (closeButton) closeButton.addEventListener('click', () => this.close());
+    if (mobileCloseButton) mobileCloseButton.addEventListener('click', () => this.close());
+    if (sendButton) sendButton.addEventListener('click', () => this.send());
+    if (mobileSendButton) mobileSendButton.addEventListener('click', () => this.send());
+
+    ['walluMessageInput', 'walluMobileMessageInput'].forEach(id => {
+      const input = document.getElementById(id);
+      if (input) {
+        input.addEventListener('input', (e) => this.updateSend(e));
+        input.addEventListener('keypress', (e) => {
+          if (e.key === 'Enter') {
+            e.preventDefault();
+            this.send();
+          }
+        });
+      }
+    });
+
+    window.addEventListener('resize', () => {
+      this.isMobile = window.innerWidth < 768;
+    });
+  }
+
+  updateSend(e) {
+    const hasText = e.target.value.trim().length > 0;
+
+    const sendButton = document.getElementById('walluSendButton');
+    const mobileSendButton = document.getElementById('walluMobileSendButton');
+
+    if (sendButton) sendButton.disabled = !hasText;
+    if (mobileSendButton) mobileSendButton.disabled = !hasText;
+
+    // Sync input values between desktop and mobile
+    const other = e.target.id === 'walluMessageInput' ? 'walluMobileMessageInput' : 'walluMessageInput';
+    const otherInput = document.getElementById(other);
+    if (otherInput) {
+      otherInput.value = e.target.value;
+    }
+  }
+
+  toggle() {
+    if (this.isOpen) this.close(); else this.open();
+  }
+
+  open() {
+    this.isOpen = true;
+    this.unreadCount = 0;
+    this.updateBadge();
+
+    if (this.isMobile) {
+      const overlay = document.getElementById('walluMobileOverlay');
+      overlay.classList.remove('wallu-mobile-hidden');
+      overlay.classList.add('show');
+      document.getElementById('walluMobileMessages').innerHTML = document.getElementById('walluChatMessages').innerHTML;
+      document.body.style.overflow = 'hidden';
+      
+      // Prevent auto-focus on mobile input
+      const input = document.getElementById('walluMobileMessageInput');
+      if (input) input.blur();
+    } else {
+      document.getElementById('walluChatWindow').classList.add('show');
+      // On desktop we focus
+      document.getElementById('walluMessageInput').focus();
+    }
+  }
+
+  close() {
+    this.isOpen = false;
+    this.updateBadge();
+
+    // Close both mobile and desktop views to handle screen size changes
+    const overlay = document.getElementById('walluMobileOverlay');
+    overlay.classList.add('wallu-mobile-hidden');
+    overlay.classList.remove('show');
+    document.getElementById('walluChatWindow').classList.remove('show');
+    document.body.style.overflow = '';
+  }
+
+  updateBadge() {
+    const badge = document.getElementById('walluNotificationBadge');
+    if (!badge) return;
+    
+    if (this.unreadCount > 0 && !this.isOpen) {
+      badge.textContent = String(this.unreadCount);
+      badge.style.visibility = 'visible';
+    } else {
+      badge.style.visibility = 'hidden';
+    }
+  }
+
+  addMessage(text, sender, isError = false) {
+    const msg = document.createElement('div');
+    msg.className = `wallu-msg ${sender}${isError ? ' error' : ''}`;
+
+    if (sender === 'bot') {
+      const avatar = document.createElement('div');
+      avatar.className = 'wallu-avatar';
+      avatar.style.cssText = `background: ${this.theme.primary}20; color: ${this.theme.primary};`;
+      avatar.textContent = 'AI';
+      msg.appendChild(avatar);
+    }
+
+    const bubble = document.createElement('div');
+    bubble.className = 'wallu-msg-bubble';
+
+    if (sender === 'user') {
+      bubble.style.background = this.theme.primary;
+    }
+
+    bubble.innerHTML = text.replace(/(https?:\/\/[^\s]+)/g, '<a href="$1" target="_blank" rel="noopener noreferrer" class="wallu-link">$1</a>');
+    msg.appendChild(bubble);
+
+    document.getElementById('walluChatMessages').appendChild(msg);
+    if (this.isMobile && this.isOpen) document.getElementById('walluMobileMessages').appendChild(msg.cloneNode(true));
+
+    this.scroll();
+    this.logToDiscord(text, sender, isError).then();
+
+    // Increment unread count for bot messages when chat is closed
+    if (sender === 'bot' && !this.isOpen) {
+      this.unreadCount++;
+      this.updateBadge();
+    }
+
+    // For demo purposes, expose this method globally
+    if (!window.walluChatWidget.addMessage) {
+      window.walluChatWidget.addMessage = this.addMessage.bind(this);
+    }
+  }
+
+  showTyping() {
+    document.getElementById('walluTypingIndicator').classList.add('show');
+    document.getElementById('walluMobileTypingIndicator').classList.add('show');
+    this.scroll();
+  }
+
+  hideTyping() {
+    document.getElementById('walluTypingIndicator').classList.remove('show');
+    document.getElementById('walluMobileTypingIndicator').classList.remove('show');
+  }
+
+  scroll() {
+    setTimeout(() => {
+      ['walluChatMessages', 'walluMobileMessages'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.scrollTop = el.scrollHeight;
+      });
+    }, 100);
+  }
+
+  async send() {
+    const input = document.getElementById(this.isMobile ? 'walluMobileMessageInput' : 'walluMessageInput');
+    const message = input.value.trim();
+    if (!message) return;
+
+    this.addMessage(message, 'user');
+    input.value = '';
+    document.getElementById(this.isMobile ? 'walluMessageInput' : 'walluMobileMessageInput').value = '';
+    document.getElementById('walluSendButton').disabled = true;
+    document.getElementById('walluMobileSendButton').disabled = true;
+
+    // Check if API key is still the default
+    if (this.config.apiKey === 'pk_your_actual_key_here') {
+      this.addMessage('❌ **API Key Error**: You need to replace the default API key with your real key from https://panel.wallubot.com/addons. The widget will not work until you set a valid API key.', 'bot', true);
+      return;
+    }
+    // Check if API key starts with pk_ (public key)
+    if (!this.config.apiKey.startsWith('pk_')) {
+      this.addMessage('❌ **Invalid API Key**: The API key doesn\'t look like a public key (should start with "pk_"). You\'re probably using a private key (sk_) which cannot be used in the widget. Get your public key from https://panel.wallubot.com/addons', 'bot', true);
+      return;
+    }
+
+    this.showTyping();
+
+    try {
+      const response = await fetch(this.apiUrl, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'X-API-Key': this.config.apiKey },
+        body: JSON.stringify({
+          addon: { name: 'web-widget (' + window.location.hostname + ')', version: '1.0.0' },
+          channel: { id: window.location.pathname, name: 'Website Chat @ ' + window.location.pathname },
+          user: { id: this.userId, username: 'Website Visitor', is_staff_member: false },
+          message: { id: this.generateId(), is_bot_mentioned: true, content: message },
+          configuration: { emoji_type: 'unicode', include_sources: false }
+        })
+      });
+
+      if (!response.ok) throw new Error(`HTTP ${response.status}`);
+
+      const data = await response.json();
+      const responseMessage = data.response?.message || data.message || 'No response available';
+      this.hideTyping();
+      this.addMessage(responseMessage, 'bot');
+    } catch (error) {
+      console.error('Wallu Widget Error:', error);
+      this.hideTyping();
+      this.addMessage('Sorry, I\'m having trouble connecting. Please try again later.', 'bot', true);
+    }
+  }
+
+  async logToDiscord(message, sender, isError) {
+    if (!this.config.discordWebhook) return;
+    try {
+      await fetch(this.config.discordWebhook, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          content: `**${sender.toUpperCase()}${isError ? ' (Error)' : ''}**: ${message}`,
+          username: 'Wallu Web Widget'
+        })
+      });
+    } catch (error) {
+      console.error('Discord webhook error:', error);
+    }
+  }
+}
 
 // ============ AUTO-INITIALIZATION ============
 (function () {
@@ -321,269 +582,6 @@ const THEMES = {
   }
 
 })();
-
-// ============ WIDGET CLASS ============
-class WalluChatWidget {
-  constructor(config, theme) {
-    this.config = config;
-    this.theme = theme;
-    this.apiUrl = 'https://api.wallubot.com/v1/on-message';
-    this.isOpen = false;
-    this.isMobile = window.innerWidth < 768;
-    this.conversationId = this.generateId();
-    this.userId = this.generateId();
-    this.unreadCount = 0;
-
-    setTimeout(() => this.init(), 100); // Wait for elements to be ready
-  }
-
-  generateId() {
-    return Date.now().toString(36) + Math.random().toString(36).substr(2);
-  }
-
-  init() {
-    this.bindEvents();
-
-    // Check if API key is still the default and show warning
-    if (this.config.apiKey === 'pk_your_actual_key_here') {
-      setTimeout(() => {
-        this.addMessage('⚠️ **Setup Required**: Please replace the default API key with your real key from https://panel.wallubot.com/addons to start using the widget.', 'bot', true);
-      }, 1500);
-    } else if (!this.config.apiKey.startsWith('pk_')) {
-      setTimeout(() => {
-        this.addMessage('❌ **Invalid API Key**: The API key doesn\'t look like a public key (should start with "pk_"). You may be using a private key (sk_) which cannot be used in the widget. Get your public key from https://panel.wallubot.com/addons', 'bot', true);
-      }, 1500);
-    }
-
-    setTimeout(() => this.addMessage(this.config.welcomeMessage, 'bot'), 1000);
-  }
-
-  bindEvents() {
-    const chatButton = document.getElementById('walluChatButton');
-    if (chatButton) chatButton.addEventListener('click', () => this.toggle());
-    const closeButton = document.getElementById('walluCloseButton');
-    const mobileCloseButton = document.getElementById('walluMobileCloseButton');
-    const sendButton = document.getElementById('walluSendButton');
-    const mobileSendButton = document.getElementById('walluMobileSendButton');
-
-    if (closeButton) closeButton.addEventListener('click', () => this.close());
-    if (mobileCloseButton) mobileCloseButton.addEventListener('click', () => this.close());
-    if (sendButton) sendButton.addEventListener('click', () => this.send());
-    if (mobileSendButton) mobileSendButton.addEventListener('click', () => this.send());
-
-    ['walluMessageInput', 'walluMobileMessageInput'].forEach(id => {
-      const input = document.getElementById(id);
-      if (input) {
-        input.addEventListener('input', (e) => this.updateSend(e));
-        input.addEventListener('keypress', (e) => {
-          if (e.key === 'Enter') {
-            e.preventDefault();
-            this.send();
-          }
-        });
-      }
-    });
-
-    window.addEventListener('resize', () => {
-      this.isMobile = window.innerWidth < 768;
-    });
-  }
-
-  updateSend(e) {
-    const hasText = e.target.value.trim().length > 0;
-
-    const sendButton = document.getElementById('walluSendButton');
-    const mobileSendButton = document.getElementById('walluMobileSendButton');
-
-    if (sendButton) sendButton.disabled = !hasText;
-    if (mobileSendButton) mobileSendButton.disabled = !hasText;
-
-    // Sync input values between desktop and mobile
-    const other = e.target.id === 'walluMessageInput' ? 'walluMobileMessageInput' : 'walluMessageInput';
-    const otherInput = document.getElementById(other);
-    if (otherInput) {
-      otherInput.value = e.target.value;
-    }
-  }
-
-  toggle() {
-    if (this.isOpen) this.close(); else this.open();
-  }
-
-  open() {
-    this.isOpen = true;
-    this.unreadCount = 0;
-    this.updateBadge();
-
-    if (this.isMobile) {
-      const overlay = document.getElementById('walluMobileOverlay');
-      overlay.classList.remove('wallu-mobile-hidden');
-      overlay.classList.add('show');
-      document.getElementById('walluMobileMessages').innerHTML = document.getElementById('walluChatMessages').innerHTML;
-      document.body.style.overflow = 'hidden';
-      
-      // Prevent auto-focus on mobile input
-      const input = document.getElementById('walluMobileMessageInput');
-      if (input) input.blur();
-    } else {
-      document.getElementById('walluChatWindow').classList.add('show');
-      // On desktop we focus
-      document.getElementById('walluMessageInput').focus();
-    }
-  }
-
-  close() {
-    this.isOpen = false;
-    this.updateBadge();
-
-    // Close both mobile and desktop views to handle screen size changes
-    const overlay = document.getElementById('walluMobileOverlay');
-    overlay.classList.add('wallu-mobile-hidden');
-    overlay.classList.remove('show');
-    document.getElementById('walluChatWindow').classList.remove('show');
-    document.body.style.overflow = '';
-  }
-
-  updateBadge() {
-    const badge = document.getElementById('walluNotificationBadge');
-    if (!badge) return;
-    
-    if (this.unreadCount > 0 && !this.isOpen) {
-      badge.textContent = String(this.unreadCount);
-      badge.style.visibility = 'visible';
-    } else {
-      badge.style.visibility = 'hidden';
-    }
-  }
-
-  addMessage(text, sender, isError = false) {
-    const msg = document.createElement('div');
-    msg.className = `wallu-msg ${sender}${isError ? ' error' : ''}`;
-
-    if (sender === 'bot') {
-      const avatar = document.createElement('div');
-      avatar.className = 'wallu-avatar';
-      avatar.style.cssText = `background: ${this.theme.primary}20; color: ${this.theme.primary};`;
-      avatar.textContent = 'AI';
-      msg.appendChild(avatar);
-    }
-
-    const bubble = document.createElement('div');
-    bubble.className = 'wallu-msg-bubble';
-
-    if (sender === 'user') {
-      bubble.style.background = this.theme.primary;
-    }
-
-    bubble.innerHTML = text.replace(/(https?:\/\/[^\s]+)/g, '<a href="$1" target="_blank" rel="noopener noreferrer" class="wallu-link">$1</a>');
-    msg.appendChild(bubble);
-
-    document.getElementById('walluChatMessages').appendChild(msg);
-    if (this.isMobile && this.isOpen) document.getElementById('walluMobileMessages').appendChild(msg.cloneNode(true));
-
-    this.scroll();
-    this.logToDiscord(text, sender, isError);
-
-    // Increment unread count for bot messages when chat is closed
-    if (sender === 'bot' && !this.isOpen) {
-      this.unreadCount++;
-      this.updateBadge();
-    }
-
-    // For demo purposes, expose this method globally
-    if (!window.walluChatWidget.addMessage) {
-      window.walluChatWidget.addMessage = this.addMessage.bind(this);
-    }
-  }
-
-  showTyping() {
-    document.getElementById('walluTypingIndicator').classList.add('show');
-    document.getElementById('walluMobileTypingIndicator').classList.add('show');
-    this.scroll();
-  }
-
-  hideTyping() {
-    document.getElementById('walluTypingIndicator').classList.remove('show');
-    document.getElementById('walluMobileTypingIndicator').classList.remove('show');
-  }
-
-  scroll() {
-    setTimeout(() => {
-      ['walluChatMessages', 'walluMobileMessages'].forEach(id => {
-        const el = document.getElementById(id);
-        if (el) el.scrollTop = el.scrollHeight;
-      });
-    }, 100);
-  }
-
-  async send() {
-    const input = document.getElementById(this.isMobile ? 'walluMobileMessageInput' : 'walluMessageInput');
-    const message = input.value.trim();
-    if (!message) return;
-
-    this.addMessage(message, 'user');
-    input.value = '';
-    document.getElementById(this.isMobile ? 'walluMessageInput' : 'walluMobileMessageInput').value = '';
-    document.getElementById('walluSendButton').disabled = true;
-    document.getElementById('walluMobileSendButton').disabled = true;
-
-    // Check if API key is still the default
-    if (this.config.apiKey === 'pk_your_actual_key_here') {
-      this.addMessage('❌ **API Key Error**: You need to replace the default API key with your real key from https://panel.wallubot.com/addons. The widget will not work until you set a valid API key.', 'bot', true);
-      return;
-    }
-    // Check if API key starts with pk_ (public key)
-    if (!this.config.apiKey.startsWith('pk_')) {
-      this.addMessage('❌ **Invalid API Key**: The API key doesn\'t look like a public key (should start with "pk_"). You\'re probably using a private key (sk_) which cannot be used in the widget. Get your public key from https://panel.wallubot.com/addons', 'bot', true);
-      return;
-    }
-
-    this.showTyping();
-
-    try {
-      const response = await fetch(this.apiUrl, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'X-API-Key': this.config.apiKey },
-        body: JSON.stringify({
-          addon: { name: 'web-widget (' + window.location.hostname + ')', version: '1.0.0' },
-          channel: { id: window.location.pathname, name: 'Website Chat @ ' + window.location.pathname },
-          user: { id: this.userId, username: 'Website Visitor', is_staff_member: false },
-          message: { id: this.generateId(), is_bot_mentioned: true, content: message },
-          configuration: { emoji_type: 'unicode', include_sources: false }
-        })
-      });
-
-      if (!response.ok) throw new Error(`HTTP ${response.status}`);
-
-      const data = await response.json();
-      const responseMessage = data.response?.message || data.message || 'No response available';
-      this.hideTyping();
-      this.addMessage(responseMessage, 'bot');
-    } catch (error) {
-      console.error('Wallu Widget Error:', error);
-      this.hideTyping();
-      this.addMessage('Sorry, I\'m having trouble connecting. Please try again later.', 'bot', true);
-    }
-  }
-
-  async logToDiscord(message, sender, isError) {
-    if (!this.config.discordWebhook) return;
-    try {
-      await fetch(this.config.discordWebhook, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          content: `**${sender.toUpperCase()}${isError ? ' (Error)' : ''}**: ${message}`,
-          username: 'Wallu Web Widget'
-        })
-      });
-    } catch (error) {
-      console.error('Discord webhook error:', error);
-    }
-    // Add welcome message
-    setTimeout(() => this.addMessage(this.config.welcomeMessage, 'bot'), 1000);
-  }
-}
 
 console.log('🚀 Wallu AI Chat Widget loaded successfully!');
 console.log('📝 Configure your API key in the WALLU_CONFIG object');
