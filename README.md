@@ -85,7 +85,7 @@ const WALLU_CONFIG = {
     position: 'bottom-right', // or 'bottom-left'
 
     // 🔗 OPTIONAL: Log conversations to Discord
-    // discordWebhook: 'https://discord.com/api/webhooks/YOUR_WEBHOOK_URL',
+    discordWebhook: true,
 };
 ```
 
@@ -341,13 +341,10 @@ new WalluChatWidget({
 
 Track conversations in Discord:
 
-1. Create a Discord webhook in your server
-2. Add the webhook URL to your widget config
-3. All conversations will be logged to that channel
-
 ```javascript
 new WalluChatWidget({
-    discordWebhook: 'https://discord.com/api/webhooks/123/abc...',
+    // Send logs to staff notification channel configured in https://panel.wallubot.com/settings
+    discordWebhook: true,
     // ... other config
 });
 ```

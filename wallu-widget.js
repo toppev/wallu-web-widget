@@ -26,9 +26,8 @@ const WALLU_CONFIG = {
   welcomeMessage: 'Hello! I\'m your AI assistant. How can I help you today?',
   fieldPlaceholder: 'Ask me anything...',
   position: 'bottom-right', // 'bottom-right', 'bottom-left'
-
-  // DISCORD WEBHOOK (optional - for conversation logging)
-  // discordWebhook: 'https://discord.com/api/webhooks/YOUR_WEBHOOK_URL',
+  // Send logs to staff notification channel configured in https://panel.wallubot.com/settings
+  discordWebhook: true,
 
   // ADVANCED: window.WALLU_CONFIG can override these settings
   // This allows configuration without editing this file
@@ -110,6 +109,7 @@ class WalluChatWidget {
     this.config = config;
     this.theme = theme;
     this.apiUrl = 'https://api.wallubot.com/v1/on-message';
+    this.logApiUrl = 'https://api.wallubot.com/v1/log-message';
     this.isOpen = false;
     this.isMobile = window.innerWidth < 768;
     this.conversationId = this.generateId();
@@ -351,16 +351,20 @@ class WalluChatWidget {
   async logToDiscord(message, sender, isError) {
     if (!this.config.discordWebhook) return;
     try {
-      await fetch(this.config.discordWebhook, {
+      await fetch(this.logApiUrl, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          'X-API-Key': this.config.apiKey
+        },
         body: JSON.stringify({
-          content: `**${sender.toUpperCase()}${isError ? ' (Error)' : ''}**: ${message}`,
-          username: 'Wallu Web Widget'
+          message: message,
+          sender: sender,
+          isError: isError
         })
       });
     } catch (error) {
-      console.error('Discord webhook error:', error);
+      console.error('Discord log error:', error);
     }
   }
 }
