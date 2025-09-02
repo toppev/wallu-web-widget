@@ -62,7 +62,7 @@ That's it! Your Discord AI is now available on your website. 🎉
         theme: 'gaming',
     }
 </script>
-<script defer src="https://cdn.jsdelivr.net/gh/toppev/wallu-web-widget/wallu-widget.js"></script>
+<script defer src="https://wallubot.com/wallu-widget.js"></script>
 ```
 
 ### Fully customizable (download & edit `wallu-widget.js`)
@@ -119,7 +119,7 @@ the [Wallu Panel - Channels](https://panel.wallubot.com/channels). This allows y
        botName: 'Support Assistant'
    };
    </script>
-   <script defer src="https://cdn.jsdelivr.net/gh/toppev/wallu-web-widget/wallu-widget.js"></script>
+   <script defer src="https://wallubot.com/wallu-widget.js"></script>
    ```
 
 **Option 2: Download and configure**
@@ -156,7 +156,7 @@ the [Wallu Panel - Channels](https://panel.wallubot.com/channels). This allows y
        botName: 'AI Assistant'
    };
    </script>
-   <script defer src="https://cdn.jsdelivr.net/gh/toppev/wallu-web-widget/wallu-widget.js"></script>
+   <script defer src="https://wallubot.com/wallu-widget.js"></script>
    ```
 3. Save changes
 
@@ -176,7 +176,7 @@ the [Wallu Panel - Channels](https://panel.wallubot.com/channels). This allows y
        botName: 'AI Assistant'
    };
    </script>
-   <script defer src="https://cdn.jsdelivr.net/gh/toppev/wallu-web-widget/wallu-widget.js"></script>
+   <script defer src="https://wallubot.com/wallu-widget.js"></script>
    ```
 4. Apply to all pages
 
@@ -199,7 +199,7 @@ export default function ChatWidget() {
 
         // Load the Wallu widget
         const script = document.createElement('script');
-        script.src = 'https://cdn.jsdelivr.net/gh/toppev/wallu-web-widget/wallu-widget.js';
+        script.src = 'https://wallubot.com/wallu-widget.js';
         script.defer = true;
         document.body.appendChild(script);
 
@@ -260,7 +260,7 @@ window.WALLU_CONFIG = {
     welcomeMessage: 'Hello! How can I help you today?'
 };
 </script>
-<script defer src="https://cdn.jsdelivr.net/gh/toppev/wallu-web-widget/wallu-widget.js"></script>
+<script defer src="https://wallubot.com/wallu-widget.js"></script>
 </body>
 </html>
 ```
