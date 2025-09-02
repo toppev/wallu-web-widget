@@ -406,7 +406,7 @@ Need help customizing or integrating? Ask Claude or ChatGPT:
 ### Getting Help
 
 1. Check [Wallu Documentation](https://wallubot.com/developers)
-2. Join our [Discord Community](https://discord.gg/wallubot)
+2. Join our [Discord Community](https://wallubot.com/discord)
 3. Contact support via the widget itself (meta!)
 4. Ask Claude or ChatGPT for coding help
 
@@ -428,7 +428,7 @@ This project is open source and available under the MIT License.
 - [Wallu AI Website](https://wallubot.com)
 - [Developer Documentation](https://wallubot.com/developers)
 - [API Reference](https://api.wallubot.com/docs)
-- [Discord Community](https://discord.gg/wallubot)
+- [Discord Community](https://wallubot.com/discord)
 
 ---
 
