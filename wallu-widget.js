@@ -23,6 +23,7 @@ const WALLU_CONFIG = {
 
   // STEP 3: Customize the experience (optional)
   botName: 'AI Assistant',
+  botAvatar: 'AI',
   welcomeMessage: 'Hello! I\'m your AI assistant. How can I help you today?',
   fieldPlaceholder: 'Ask me anything...',
   position: 'bottom-right', // 'bottom-right', 'bottom-left'
@@ -246,7 +247,7 @@ class WalluChatWidget {
       const avatar = document.createElement('div');
       avatar.className = 'wallu-avatar';
       avatar.style.cssText = `background: ${this.theme.primary}20; color: ${this.theme.primary};`;
-      avatar.textContent = 'AI';
+      avatar.textContent = this.config.botAvatar;
       msg.appendChild(avatar);
     }
 
@@ -513,7 +514,7 @@ class WalluChatWidget {
                 <div id="walluChatMessages" class="wallu-messages"></div>
 
                 <div id="walluTypingIndicator" class="wallu-typing">
-                    <div class="wallu-avatar" style="background: ${theme.primary}20; color: ${theme.primary};">AI</div>
+                    <div class="wallu-avatar" style="background: ${theme.primary}20; color: ${theme.primary};">${WALLU_CONFIG.botAvatar}</div>
                     <div class="wallu-typing-dots">
                         <div class="wallu-typing-dot"></div>
                         <div class="wallu-typing-dot"></div>
@@ -547,7 +548,7 @@ class WalluChatWidget {
                 <div id="walluMobileMessages" class="wallu-messages"></div>
                 
                 <div id="walluMobileTypingIndicator" class="wallu-typing">
-                    <div class="wallu-avatar" style="background: ${theme.primary}20; color: ${theme.primary};">AI</div>
+                    <div class="wallu-avatar" style="background: ${theme.primary}20; color: ${theme.primary};">${WALLU_CONFIG.botAvatar}</div>
                     <div class="wallu-typing-dots">
                         <div class="wallu-typing-dot"></div>
                         <div class="wallu-typing-dot"></div>
