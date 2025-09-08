@@ -137,7 +137,7 @@ class WalluChatWidget {
       }, 1500);
     }
 
-    setTimeout(() => this.addMessage(this.config.welcomeMessage, 'bot'), 1000);
+    setTimeout(() => this.addMessage(this.config.welcomeMessage, 'bot', false, true), 1000);
   }
 
   bindEvents() {
@@ -238,7 +238,7 @@ class WalluChatWidget {
     }
   }
 
-  addMessage(text, sender, isError = false) {
+  addMessage(text, sender, isError = false, skipLogging = false) {
     const msg = document.createElement('div');
     msg.className = `wallu-msg ${sender}${isError ? ' error' : ''}`;
 
@@ -264,7 +264,7 @@ class WalluChatWidget {
     if (this.isMobile && this.isOpen) document.getElementById('walluMobileMessages').appendChild(msg.cloneNode(true));
 
     this.scroll();
-    this.logToDiscord(text, sender, isError).then();
+    if (!skipLogging) this.logToDiscord(text, sender, isError).then();
 
     // Increment unread count for bot messages when chat is closed
     if (sender === 'bot' && !this.isOpen) {
