@@ -427,10 +427,12 @@
   // This overrides the placeholder in wallu-widget.js
   window.WALLU_CONFIG = {
     // This is public key (pk) - safe to expose in client-side code
-    apiKey: 'pk_90136f0a20f3bddbc340a99a878b96d2e28cb09e96c9e9d2e5d6dae629e6e46f',
+    apiKey: 'pk_6ec7c521835e68e6f79b72333702f6d12f0207e3593822bb2f90bc49ef44c4dd',
     botName: 'Wallu AI Demo',
     welcomeMessage: 'Hey! 👋 I\'m your Discord AI assistant, now extended to your website. I have the same knowledge from your Discord server and can help visitors just like I help your community members!',
-    theme: 'discord'
+    theme: 'discord',
+    // For Wallu's own local development/testing (not for anyone else)
+    baseUrl: 'http://localhost:8020'
   };
 
   // Theme management with localStorage

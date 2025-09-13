@@ -30,8 +30,9 @@ const WALLU_CONFIG = {
   // Send logs to staff notification channel configured in https://panel.wallubot.com/settings
   discordWebhook: true,
 
-  // ADVANCED: window.WALLU_CONFIG can override these settings
-  // This allows configuration without editing this file
+  // Do not modify this baseUrl
+  baseUrl: 'https://api.wallubot.com/v1',
+  // This allows configuration without editing this file (window.WALLU_CONFIG can override these settings)
   ...(window.WALLU_CONFIG || {})
 };
 
@@ -109,8 +110,8 @@ class WalluChatWidget {
   constructor(config, theme) {
     this.config = config;
     this.theme = theme;
-    this.apiUrl = 'https://api.wallubot.com/v1/on-message';
-    this.logApiUrl = 'https://api.wallubot.com/v1/log-message';
+    this.apiUrl = WALLU_CONFIG.baseUrl + '/on-message';
+    this.logApiUrl = WALLU_CONFIG.baseUrl + '/log-message';
     this.isOpen = false;
     this.isMobile = window.innerWidth < 768;
     this.conversationId = this.generateId();
@@ -239,7 +240,8 @@ class WalluChatWidget {
     }
   }
 
-  addMessage(text, sender, isError = false, skipLogging = false) {
+  addMessage(text, sender, isError = false, skipLogging = false, attachments = []) {
+    // Add the text message
     const msg = document.createElement('div');
     msg.className = `wallu-msg ${sender}${isError ? ' error' : ''}`;
 
@@ -263,6 +265,13 @@ class WalluChatWidget {
 
     document.getElementById('walluChatMessages').appendChild(msg);
     if (this.isMobile && this.isOpen) document.getElementById('walluMobileMessages').appendChild(msg.cloneNode(true));
+
+    // Add attachments as separate messages if present
+    if (attachments && attachments.length > 0) {
+      attachments.forEach(attachment => {
+        this.addAttachmentMessage(attachment, sender);
+      });
+    }
 
     this.scroll();
     if (!skipLogging) this.logToDiscord(text, sender, isError).then();
@@ -341,7 +350,7 @@ class WalluChatWidget {
       const data = await response.json();
       const responseMessage = data.response?.message || data.message || 'No response available';
       this.hideTyping();
-      this.addMessage(responseMessage, 'bot');
+      this.addMessage(responseMessage, 'bot', false, false,  data.response?.attachments || []);
     } catch (error) {
       console.error('Wallu Widget Error:', error);
       this.hideTyping();
@@ -367,6 +376,203 @@ class WalluChatWidget {
     } catch (error) {
       console.error('Discord log error:', error);
     }
+  }
+
+  addAttachmentMessage(attachment, sender) {
+    const msg = document.createElement('div');
+    msg.className = `wallu-msg wallu-attachment-msg ${sender}`;
+    if (sender === 'bot') {
+      // Add a smaller, subtle avatar for attachment messages
+      const avatar = document.createElement('div');
+      avatar.className = 'wallu-avatar';
+      avatar.style.cssText = `
+        background: transparent;
+        color: ${this.theme.textSecondary};
+        font-size: 10px;
+        width: 24px;
+        height: 24px;
+        margin-top: 8px;
+      `;
+      avatar.textContent = '📎';
+      msg.appendChild(avatar);
+    }
+    msg.appendChild(this.createAttachmentElement(attachment));
+    document.getElementById('walluChatMessages').appendChild(msg);
+    if (this.isMobile && this.isOpen) document.getElementById('walluMobileMessages').appendChild(msg.cloneNode(true));
+  }
+
+  createAttachmentElement(attachment) {
+    const { id, filename, mime_type, alt_text, url } = attachment;
+    const isImage = mime_type.startsWith('image/');
+    if (isImage) return this.createImageAttachment(url, filename, alt_text);
+    return this.createFileAttachment(url, filename, mime_type);
+  }
+
+  createImageAttachment(url, filename, alt_text) {
+    const container = document.createElement('div');
+    container.className = 'wallu-attachment wallu-image-attachment';
+    
+    const img = document.createElement('img');
+    img.src = url;
+    img.alt = alt_text || filename;
+    img.className = 'wallu-attachment-image';
+    img.style.cssText = `
+      max-width: 250px;
+      max-height: 200px;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+    `;
+    
+    img.addEventListener('click', () => this.openImageFullscreen(url, alt_text || filename));
+    img.addEventListener('mouseenter', () => {
+      img.style.opacity = '0.9';
+      img.style.transform = 'scale(1.02)';
+    });
+    img.addEventListener('mouseleave', () => {
+      img.style.opacity = '1';
+      img.style.transform = 'scale(1)';
+    });
+    
+    container.appendChild(img);
+    return container;
+  }
+
+  createFileAttachment(url, filename, mime_type) {
+    const container = document.createElement('div');
+    container.className = 'wallu-attachment wallu-file-attachment';
+    container.style.cssText = `
+      display: flex;
+      align-items: center;
+      padding: 12px;
+      background: ${this.theme.inputBg};
+      border-radius: 8px;
+      margin-top: 8px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      border: 1px solid rgba(0,0,0,0.06);
+    `;
+    
+    const icon = document.createElement('div');
+    icon.className = 'wallu-file-icon';
+    icon.innerHTML = this.getFileIcon(mime_type);
+    icon.style.cssText = `
+      width: 32px;
+      height: 32px;
+      margin-right: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: ${this.theme.primary};
+    `;
+    
+    const info = document.createElement('div');
+    info.className = 'wallu-file-info';
+    info.innerHTML = `
+      <div style="font-weight: 500; color: ${this.theme.text};">${filename}</div>
+      <div style="font-size: 12px; color: ${this.theme.textSecondary};">${this.getFileTypeLabel(mime_type)}</div>
+    `;
+    
+    container.appendChild(icon);
+    container.appendChild(info);
+    
+    container.addEventListener('click', () => this.handleFileClick(url, filename, mime_type));
+    container.addEventListener('mouseenter', () => container.style.background = this.theme.surface);
+    container.addEventListener('mouseleave', () => container.style.background = this.theme.inputBg);
+    
+    return container;
+  }
+
+  openImageFullscreen(url, alt_text) {
+    const overlay = document.createElement('div');
+    overlay.className = 'wallu-image-overlay';
+    overlay.style.cssText = `
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: rgba(0,0,0,0.9);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000001;
+      cursor: pointer;
+    `;
+    
+    const img = document.createElement('img');
+    img.src = url;
+    img.alt = alt_text;
+    img.style.cssText = `
+      max-width: 90vw;
+      max-height: 90vh;
+      object-fit: contain;
+      border-radius: 8px;
+    `;
+    
+    overlay.appendChild(img);
+    document.body.appendChild(overlay);
+    
+    const closeOverlay = () => {
+      document.body.removeChild(overlay);
+      document.body.style.overflow = '';
+    };
+    
+    overlay.addEventListener('click', closeOverlay);
+    document.addEventListener('keydown', function onEscape(e) {
+      if (e.key === 'Escape') {
+        closeOverlay();
+        document.removeEventListener('keydown', onEscape);
+      }
+    });
+    
+    document.body.style.overflow = 'hidden';
+  }
+
+  handleFileClick(url, filename, mime_type) {
+    const shouldOpenInBrowser = ['application/pdf', 'image/', 'video/', 'audio/'].some(it => mime_type.startsWith(it))
+    if (shouldOpenInBrowser) {
+      window.open(url, '_blank', 'noopener,noreferrer');
+    } else {
+      this.downloadFile(url, filename);
+    }
+  }
+
+  downloadFile(url, filename) {
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = filename;
+    a.style.display = 'none';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+  }
+
+  getFileIcon(mime_type) {
+    if (mime_type.startsWith('image/')) return '🖼️';
+    if (mime_type.startsWith('video/')) return '🎥';
+    if (mime_type.startsWith('audio/')) return '🎵';
+    if (mime_type === 'application/pdf') return '📄';
+    if (mime_type.startsWith('text/')) return '📝';
+    if (mime_type.includes('zip') || mime_type.includes('archive')) return '📦';
+    if (mime_type.includes('word') || mime_type.includes('document')) return '📄';
+    if (mime_type.includes('excel') || mime_type.includes('spreadsheet')) return '📊';
+    if (mime_type.includes('powerpoint') || mime_type.includes('presentation')) return '📈';
+    return '📎';
+  }
+
+  getFileTypeLabel(mime_type) {
+    if (mime_type.startsWith('image/')) return 'Image';
+    if (mime_type.startsWith('video/')) return 'Video';
+    if (mime_type.startsWith('audio/')) return 'Audio';
+    if (mime_type === 'application/pdf') return 'PDF Document';
+    if (mime_type.startsWith('text/')) return 'Text File';
+    if (mime_type.includes('zip')) return 'Archive';
+    if (mime_type.includes('word')) return 'Word Document';
+    if (mime_type.includes('excel')) return 'Spreadsheet';
+    if (mime_type.includes('powerpoint')) return 'Presentation';
+    return 'File';
   }
 }
 
@@ -476,6 +682,13 @@ class WalluChatWidget {
         
         .wallu-link { text-decoration: underline !important; color: ${theme.primary} !important; transition: all 0.2s ease !important; }
         .wallu-link:hover { text-decoration: none !important; opacity: 0.8 !important; }
+        
+        .wallu-attachment-msg { margin-top: 8px !important; }
+        .wallu-attachment-msg.bot { margin-left: 20px !important; }
+        .wallu-attachment-msg.user { justify-content: flex-end !important; }
+        .wallu-image-attachment { text-align: center !important; max-width: 280px !important; }
+        .wallu-file-attachment { max-width: 280px !important; }
+        .wallu-file-attachment:hover { transform: translateY(-1px) !important; box-shadow: 0 4px 16px rgba(0,0,0,0.08) !important; }
         
         @media (max-width: 767px) {
           .wallu-mobile-hidden { display: none !important; }
