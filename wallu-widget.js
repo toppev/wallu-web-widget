@@ -660,7 +660,7 @@ class WalluChatWidget {
         .wallu-typing-dot:nth-child(3) { animation-delay: 0.4s !important; }
         .wallu-input { padding: 24px !important; backdrop-filter: blur(16px) !important; display: flex !important; align-items: center !important; gap: 14px !important;}
         .wallu-input input {
-          flex: 1 !important; border: none !important; border-radius: 14px !important; padding: 14px 18px !important; outline: none !important; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important; background: ${theme.inputBg} !important; box-shadow: 0 2px 12px rgba(0,0,0,0.06), 0 0 0 1px rgba(0,0,0,0.04) !important; font-size: 15px !important; color: ${theme.text} !important; font-weight: 400 !important;
+          flex: 1 !important; border: none !important; border-radius: 14px !important; padding: 14px 18px !important; outline: none !important; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important; background: ${theme.inputBg} !important; box-shadow: 0 2px 12px rgba(0,0,0,0.06), 0 0 0 1px rgba(0,0,0,0.04) !important; font-size: 16px !important; color: ${theme.text} !important; font-weight: 400 !important;
         }
         .wallu-input input:focus { box-shadow: 0 0 0 4px ${theme.primary}25, 0 4px 20px rgba(0,0,0,0.1), 0 0 0 1px ${theme.primary} !important; }
         .wallu-input input::placeholder { color: ${theme.textSecondary} !important; opacity: 0.8 !important; }
