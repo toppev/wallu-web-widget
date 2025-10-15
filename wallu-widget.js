@@ -260,7 +260,7 @@ class WalluChatWidget {
       bubble.style.background = this.theme.primary;
     }
 
-    bubble.innerHTML = text.replace(/(https?:\/\/[^\s]+)/g, '<a href="$1" target="_blank" rel="noopener noreferrer" class="wallu-link">$1</a>');
+    bubble.innerHTML = text.replace(/\n/g, '<br>').replace(/(https?:\/\/[^\s]+)/g, '<a href="$1" target="_blank" rel="noopener noreferrer" class="wallu-link">$1</a>');
     msg.appendChild(bubble);
 
     document.getElementById('walluChatMessages').appendChild(msg);
