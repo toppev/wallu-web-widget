@@ -86,6 +86,11 @@ const WALLU_CONFIG = {
 
     // 🔗 OPTIONAL: Log conversations to Discord
     discordWebhook: true,
+
+    // 🔒 OPTIONAL: pin what the widget claims so you can lock this key to it (see "Restrict which
+    // knowledge the widget can reach" below). Defaults to the page path + your site host.
+    channelId: null, // e.g. '/website-support'
+    addonName: null, // e.g. 'web-widget (mysite.com)'
 };
 ```
 
@@ -94,6 +99,7 @@ const WALLU_CONFIG = {
 **Custom Bot Instructions per Channel:**  
 You can set specific instructions for your AI assistant for different parts of your website by configuring channels in
 the [Wallu Panel - Channels](https://panel.wallubot.com/channels). This allows you to have different bot behavior on different pages or sections of your site.
+Each request's "channel" is the page path (or your `channelId`), so per-page instructions and the key restrictions below both key off the same value.
 
 **Examples:**
 
@@ -327,6 +333,31 @@ new WalluChatWidget({
     - Allow full access to your bot settings
     - Can modify documents, settings, etc.
     - Keep these server-side only
+
+### Restrict which knowledge the widget can reach
+
+By default the widget can reach **all** of your Discord bot's knowledge - usually exactly what you want, the same answers on your
+site as in Discord. But a public key is visible in your page source, so anyone can copy it and send a **different** `channel.id` or
+`addon.name` to the API. If you keep some FAQs or documents restricted to a specific Discord channel or addon, someone could use
+your key to pull those answers onto their own page too.
+
+Each message the widget sends claims:
+
+- `channel.id` = the current page path (e.g. `/support`), or your `channelId` if you set one
+- `addon.name` = `web-widget (yourdomain.com)`, or your `addonName` if you set one
+
+To lock the key to only what the widget actually sends, open the [Addons page](https://panel.wallubot.com/addons), edit your public
+key, and set **Restrict knowledge**:
+
+- **Allowed channels** - e.g. `/*` to allow any page on your site (this alone blocks anyone claiming a real Discord channel id)
+- **Allowed addons** - e.g. `web-widget (yourdomain.com)`
+
+`*` is a wildcard. Set **both** to fully lock a key - leaving one empty allows anything for it. Requests outside the allowed values
+are rejected with `403`. To pin the widget to a **single** channel's knowledge, set `channelId`/`addonName` in the config and allow
+exactly those values.
+
+If you don't restrict any FAQs/documents per channel, you don't need to do this - there's nothing extra to unlock and the widget
+just uses your general knowledge.
 
 ### Rate Limiting & Abuse Prevention
 

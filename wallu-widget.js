@@ -30,6 +30,12 @@ const WALLU_CONFIG = {
   // Send logs to staff notification channel configured in https://panel.wallubot.com/settings
   discordWebhook: true,
 
+  // 🔒 OPTIONAL: pin the channel.id / addon.name this widget claims. Only needed if you restrict some
+  // FAQs/documents to specific channels and want to lock this public key to what the widget sends, on
+  // https://panel.wallubot.com/addons -> Restrict knowledge. Leave null to use the page path + site host.
+  channelId: null, // e.g. '/website-support' - defaults to the page path (window.location.pathname)
+  addonName: null, // e.g. 'web-widget (mysite.com)' - defaults to 'web-widget (<your site host>)'
+
   // Do not modify this baseUrl
   baseUrl: 'https://api.wallubot.com/v1',
   // This allows configuration without editing this file (window.WALLU_CONFIG can override these settings)
@@ -332,19 +338,25 @@ class WalluChatWidget {
 
     this.showTyping();
 
+    // channel.id/addon.name are what a scoped key is locked to (see WALLU_CONFIG above); default to page path + host
+    const channelId = this.config.channelId || window.location.pathname;
+    const addonName = this.config.addonName || 'web-widget (' + window.location.hostname + ')';
+
     try {
       const response = await fetch(this.apiUrl, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'X-API-Key': this.config.apiKey },
         body: JSON.stringify({
-          addon: { name: 'web-widget (' + window.location.hostname + ')', version: '1.0.0' },
-          channel: { id: window.location.pathname, name: 'Website Chat @ ' + window.location.pathname },
+          addon: { name: addonName, version: '1.0.0' },
+          channel: { id: channelId, name: 'Website Chat @ ' + channelId },
           user: { id: this.userId, username: 'Website Visitor', is_staff_member: false },
           message: { id: this.generateId(), is_bot_mentioned: true, content: message },
           configuration: { emoji_type: 'unicode', include_sources: false }
         })
       });
 
+      // 403 here usually means the key's "Restrict knowledge" scope doesn't allow this channelId/addonName
+      if (response.status === 403) console.warn(`Wallu Widget: 403 - API key not allowed for channel "${channelId}" / addon "${addonName}". Check the key's allowed channels/addons at https://panel.wallubot.com/addons`);
       if (!response.ok) throw new Error(`HTTP ${response.status}`);
 
       const data = await response.json();
