@@ -80,8 +80,10 @@ const WALLU_CONFIG = {
     theme: 'discord', // 'discord', 'corporate', 'tech', 'gaming', 'minimal'
 
     // 📝 OPTIONAL: Customize the experience
+    // Keep it clear that visitors are chatting with an AI - required in the EU (AI Act art. 50) and just good practice
     botName: 'AI Assistant',
-    welcomeMessage: 'Hey! I\'m here to help with the same knowledge from our Discord.',
+    headerSubtitle: 'AI assistant - replies are automated',
+    welcomeMessage: 'Hey! I\'m an AI assistant and I help with the same knowledge from our Discord.',
     position: 'bottom-right', // or 'bottom-left'
 
     // 🔗 OPTIONAL: Log conversations to Discord
@@ -122,7 +124,7 @@ Each request's "channel" is the page path (or your `channelId`), so per-page ins
    window.WALLU_CONFIG = {
        apiKey: 'pk_your_actual_key_here', // 🔑 REQUIRED: Get from https://panel.wallubot.com/addons
        theme: 'corporate',
-       botName: 'Support Assistant'
+       botName: 'AI Support Assistant'
    };
    </script>
    <script defer src="https://wallubot.com/wallu-widget.js"></script>
@@ -200,7 +202,7 @@ export default function ChatWidget() {
             apiKey: 'pk_your_actual_key_here', // 🔑 REQUIRED: Get from https://panel.wallubot.com/addons
             theme: 'discord',
             botName: 'AI Assistant',
-            welcomeMessage: 'Hey! I\'m here to help with the same knowledge from our Discord.'
+            welcomeMessage: 'Hey! I\'m an AI assistant and I help with the same knowledge from our Discord.'
         };
 
         // Load the Wallu widget
@@ -263,7 +265,7 @@ window.WALLU_CONFIG = {
     apiKey: 'pk_your_actual_key_here', // 🔑 REQUIRED: Get from https://panel.wallubot.com/addons
     theme: 'discord',
     botName: 'AI Assistant',
-    welcomeMessage: 'Hello! How can I help you today?'
+    welcomeMessage: 'Hello! I\'m an AI assistant. How can I help you today?'
 };
 </script>
 <script defer src="https://wallubot.com/wallu-widget.js"></script>
@@ -314,11 +316,15 @@ const themes = {
 new WalluChatWidget({
     botName: 'Your Bot Name',
     botAvatar: 'AI', // Or emoji like '🤖'
+    headerSubtitle: 'AI assistant - replies are automated', // Shown under the bot name
     welcomeMessage: 'Custom welcome message here!',
     placeholderText: 'Type your question...',
     // ... other options
 });
 ```
+
+The defaults say up front that the visitor is talking to an AI (bot name, header subtitle and welcome message). If you change these
+texts, keep that clear - the EU AI Act (art. 50) requires people to be told when they're chatting with an AI rather than a human.
 
 ## 🔒 Security & API Keys
 

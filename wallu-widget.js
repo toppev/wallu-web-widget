@@ -22,9 +22,11 @@ const WALLU_CONFIG = {
   theme: 'tech',
 
   // STEP 3: Customize the experience (optional)
+  // Keep it clear that visitors are chatting with an AI - required in the EU (AI Act art. 50) and just good practice
   botName: 'AI Assistant',
   botAvatar: 'AI',
-  welcomeMessage: 'Hello! I\'m your AI assistant. How can I help you today?',
+  headerSubtitle: 'AI assistant - replies are automated',
+  welcomeMessage: 'Hi! I\'m an AI assistant, not a human. How can I help you today?',
   fieldPlaceholder: 'Ask me anything...',
   position: 'bottom-right', // 'bottom-right', 'bottom-left'
   // Send logs to staff notification channel configured in https://panel.wallubot.com/settings
@@ -726,7 +728,7 @@ class WalluChatWidget {
                 <div class="wallu-header" style="background: linear-gradient(135deg, ${theme.primary}, ${theme.secondary});">
                     <div>
                         <h3 style="font-size: 18px; font-weight: 600; margin: 0;">${WALLU_CONFIG.botName}</h3>
-                        <p style="font-size: 14px; margin: 4px 0 0; color: rgba(255,255,255,0.8);">How can we help you?</p>
+                        <p style="font-size: 14px; margin: 4px 0 0; color: rgba(255,255,255,0.8);">${WALLU_CONFIG.headerSubtitle}</p>
                     </div>
                     <button id="walluCloseButton" class="wallu-close">
                         <svg width="20" height="20" fill="currentColor" viewBox="0 0 20 20">
@@ -761,7 +763,7 @@ class WalluChatWidget {
                 <div class="wallu-header" style="background: linear-gradient(135deg, ${theme.primary}, ${theme.secondary});">
                     <div>
                         <h3 style="font-size: 18px; font-weight: 600; margin: 0;">${WALLU_CONFIG.botName}</h3>
-                        <p style="font-size: 14px; margin: 4px 0 0; color: rgba(255,255,255,0.8);">How can we help you?</p>
+                        <p style="font-size: 14px; margin: 4px 0 0; color: rgba(255,255,255,0.8);">${WALLU_CONFIG.headerSubtitle}</p>
                     </div>
                     <button id="walluMobileCloseButton" class="wallu-close">
                         <svg width="24" height="24" fill="currentColor" viewBox="0 0 20 20">
