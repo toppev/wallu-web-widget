@@ -113,6 +113,8 @@ const THEMES = {
   }
 };
 
+const escapeHtml = (value) => String(value ?? '').replace(/[&<>"']/g, ch => ({'&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'}[ch]));
+
 // ============ WIDGET CLASS ============
 class WalluChatWidget {
   constructor(config, theme) {
@@ -268,7 +270,8 @@ class WalluChatWidget {
       bubble.style.background = this.theme.primary;
     }
 
-    bubble.innerHTML = text.replace(/\n/g, '<br>').replace(/(https?:\/\/[^\s]+)/g, '<a href="$1" target="_blank" rel="noopener noreferrer" class="wallu-link">$1</a>');
+    // escape first: bot answers can repeat text from imported docs/Discord channels, and this runs on the site's own origin
+    bubble.innerHTML = escapeHtml(text).replace(/\n/g, '<br>').replace(/(https?:\/\/[^\s<]+)/g, '<a href="$1" target="_blank" rel="noopener noreferrer" class="wallu-link">$1</a>');
     msg.appendChild(bubble);
 
     document.getElementById('walluChatMessages').appendChild(msg);
@@ -484,7 +487,7 @@ class WalluChatWidget {
     const info = document.createElement('div');
     info.className = 'wallu-file-info';
     info.innerHTML = `
-      <div style="font-weight: 500; color: ${this.theme.text};">${filename}</div>
+      <div style="font-weight: 500; color: ${this.theme.text};">${escapeHtml(filename)}</div>
       <div style="font-size: 12px; color: ${this.theme.textSecondary};">${this.getFileTypeLabel(mime_type)}</div>
     `;
     
